@@ -23,4 +23,24 @@ variable "admin_password" {
 
 variable "vm_size" {
  default = "t2.micro"
+} 
+data "aws_ami" "terraformami" {
+  owners = ["self"]
+  filter {
+    name = "name"
+    values = ["terraform-workshop-image-do-not-delete"]
+  }
+  
 }
+
+data "aws_ami" "my-privateami" {
+    owners = ["self"]  # Queries only AMIs owned by your account
+
+}
+
+output "yanivsami" {
+  value = data.aws_ami.my-privateami
+}
+
+output "terraformimage" {
+  value = data.aws_ami.terraformami
