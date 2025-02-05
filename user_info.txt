@@ -1,0 +1,3 @@
+GITBRANCH=workshop/terraform
+GITURL=github.com/Nehorai4/devopshift-welcome.git
+GITUSERNAME=Nehorai4

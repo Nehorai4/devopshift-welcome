@@ -1,12 +1,3 @@
-terraform {
-  required_providers {
-    time = {
-      source  = "hashicorp/time"
-      version = "0.12.1"  # Make sure to use the version that match latest version
-    }
-  }
-}
-
 provider "aws" {
   region = var.region
 }
@@ -15,12 +6,14 @@ variable "region" {
   default = "us-east-1"
 }
 
-resource "time_sleep" "wait_for_ip" {
-  create_duration = "10s"  # Wait for 10 seconds
+
+# Mocked IP var
+variable "emptyip" {
+    default = ""
 }
-  
+
 resource "aws_security_group" "sg" {
-ingress {
+  ingress {
     from_port   = 22
     to_port     = 22
     protocol    = "tcp"
@@ -36,7 +29,8 @@ ingress {
 }
 
 resource "aws_instance" "vm" {
-  ami           = "ami-0c02fb55956c7d316" # Amazon Linux 2 AMI in us-east-1
+  
+  ami           = "ami-0c02fb55956c7d316"
   instance_type = "t2.micro"
 
   vpc_security_group_ids = [aws_security_group.sg.id]
@@ -46,14 +40,25 @@ resource "aws_instance" "vm" {
   }
 }
 
+
+
 output "vm_public_ip" {
   value       = aws_instance.vm.public_ip
-  depends_on  = [time_sleep.wait_for_ip]  # Wait for the time_sleep resource to complete
   description = "Public IP address of the VM"
+  depends_on = [ null_resource.check_public_ip ]
 }
 
-resource "null_resource" "run_script" {
+resource "null_resource" "check_public_ip" {
   provisioner "local-exec" {
-    command = "echo 'Hello jb Class'"
-  } 
+    command = <<EOT
+      if [ -z "${aws_instance.vm.public_ip}" ]; then
+        echo "ERROR: Public IP address was not assigned." >&2
+        exit 1
+        else
+        echo "We got the IP! ${aws_instance.vm.public_ip}"
+      fi
+    EOT
+  }
+
+  depends_on = [aws_instance.vm]
 }
