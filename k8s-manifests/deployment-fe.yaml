@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: fe
-          image: nehoraiiii/fe-exam:latest
+          image: olego700/fe-exam
           ports:
             - containerPort: 5002
