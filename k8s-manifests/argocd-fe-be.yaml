@@ -7,8 +7,8 @@ spec:
   project: default
   source:
     repoURL: 'https://github.com/Nehorai4/devopshift-welcome.git'
-    targetRevision: HEAD
-    path: k8s-manifests
+    targetRevision: 'workshop/argo-jenkins-exam'  # שינוי כאן
+    path: 'k8s-manifests'
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: fe-be-app
